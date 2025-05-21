@@ -1,4 +1,13 @@
+terraform {
+  required_providers {
+    vagrant = {
+      source = "hashicorp/vagrant"
+      version = "~> 0.1"
+    }
+  }
 
+  required_version = ">= 0.12"
+}
 provider "vagrant" {}
 
 resource "vagrant_vm" "tikvm" {
