@@ -2,7 +2,7 @@ terraform {
   required_providers {
     vagrant = {
       source = "hashicorp/vagrant"
-      version = "~> 0.1"
+      version = "~> 0.3"
     }
   }
 
