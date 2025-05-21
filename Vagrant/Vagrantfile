@@ -1,0 +1,28 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64"  # Use Ubuntu as the base box
+
+  # Sync the project folder with the VM
+  config.vm.synced_folder "../", "/home/vagrant/tiktok"  # Sync project directory with VM
+
+  # Provisioning script to install Docker, Jenkins, and other necessary software
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update
+    sudo apt-get install -y openjdk-11-jdk maven git docker.io curl gnupg2
+    sudo systemctl enable docker
+    sudo usermod -aG docker vagrant
+    curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+    echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+    sudo apt-get update
+    sudo apt-get install -y jenkins
+    sudo systemctl enable jenkins
+    sudo systemctl start jenkins
+
+    # Install Docker Compose
+    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+  SHELL
+
+  # Forward Jenkins port to host machine
+  config.vm.network "forwarded_port", guest: 8080, host: 8080
+  config.vm.network "forwarded_port", guest: 8081, host: 8081
+end
